@@ -172,15 +172,16 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
     
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
         view.selected = false
+        // get the selected annotation and its pin
+        let pin = (view.annotation as! MKPointAnnotation).pin
+        let annotation = annotationForPin(pin)
         if userIsEditing {
             // editing mode is on, delete selected pins
-            let pin = (view.annotation as! MKPointAnnotation).pin
-            let annotation = annotationForPin(pin)
             context.deleteObject(pin)
             mapView.removeAnnotation(annotation as MKAnnotation)
         } else { // editing mode is off, navigate to the photo album view
             // make sure no pins stay selected for longer than they're supposed to
-            mapView.selectAnnotation(nil, animated: false)
+            mapView.deselectAnnotation(annotation, animated: false)
             // cancel any ongoing download tasks
             for i in downloadTasks {
                 i.cancel()
@@ -224,7 +225,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         updatedIndexPaths = [NSIndexPath]()
     }
     
-    func controller(controller: NSFetchedResultsController, didChangeObject anObject: NSManagedObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
         
         switch type {
         case .Insert:

@@ -23,7 +23,7 @@ class FlickrClient: NSObject {
                 completionHandler(data: nil, errorString: error!.localizedDescription)
             } else {
                 var parsingError: NSError? = nil
-                let parsedResult = (try! NSJSONSerialization.JSONObjectWithData(data, options: .AllowFragments)) as! NSDictionary
+                let parsedResult = (try! NSJSONSerialization.JSONObjectWithData(data!, options: .AllowFragments)) as! NSDictionary
                 completionHandler(data: parsedResult, errorString: nil)
             }
         }
@@ -59,7 +59,7 @@ class FlickrClient: NSObject {
         request.HTTPMethod = "GET"
         let task = session.dataTaskWithRequest(request) {data, response, error in
             if error != nil {
-                completionHandler(data: nil, errorString: error.localizedDescription)
+                completionHandler(data: nil, errorString: error!.localizedDescription)
             } else {
                 completionHandler(data: data, errorString: nil)
             }
