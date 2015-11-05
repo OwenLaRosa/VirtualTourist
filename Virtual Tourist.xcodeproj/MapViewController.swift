@@ -53,7 +53,11 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         // get all pin instances from CoreData
         var error: NSError?
         fetchedResultsController.delegate = self
-        fetchedResultsController.performFetch(&error)
+        do {
+            try fetchedResultsController.performFetch()
+        } catch let error1 as NSError {
+            error = error1
+        }
         
         // create point annotations for each of the resulting objects
         for i in fetchedResultsController.fetchedObjects! {
@@ -158,7 +162,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
     
     // MARK: - Map View Delegate
     
-    func mapView(mapView: MKMapView!, regionDidChangeAnimated animated: Bool) {
+    func mapView(mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
         // persist region change
         userDefaults.setObject(NSNumber(double: mapView.region.center.latitude), forKey: UserDefaultKeys.centerLatitude)
         userDefaults.setObject(NSNumber(double: mapView.region.center.longitude), forKey: UserDefaultKeys.centerLongitude)
@@ -166,7 +170,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         userDefaults.setObject(NSNumber(double: mapView.region.span.longitudeDelta), forKey: UserDefaultKeys.longitudeDelta)
     }
     
-    func mapView(mapView: MKMapView!, didSelectAnnotationView view: MKAnnotationView!) {
+    func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
         view.selected = false
         if userIsEditing {
             // editing mode is on, delete selected pins
@@ -220,7 +224,7 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
         updatedIndexPaths = [NSIndexPath]()
     }
     
-    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+    func controller(controller: NSFetchedResultsController, didChangeObject anObject: NSManagedObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
         
         switch type {
         case .Insert:
@@ -257,7 +261,10 @@ class MapViewController: UIViewController, MKMapViewDelegate, NSFetchedResultsCo
             annotation.coordinate = CLLocationCoordinate2D(latitude: pin.latitude as Double, longitude: pin.longitude as Double)
         }
         
-        context.save(nil)
+        do {
+            try context.save()
+        } catch _ {
+        }
     }
     
     // MARK: - Helper Methods
@@ -303,7 +310,7 @@ extension MKPointAnnotation {
             return objc_getAssociatedObject(self, &associationKey) as! Pin
         }
         set(newValue) {
-            objc_setAssociatedObject(self, &associationKey, newValue, objc_AssociationPolicy(OBJC_ASSOCIATION_RETAIN))
+            objc_setAssociatedObject(self, &associationKey, newValue, objc_AssociationPolicy.OBJC_ASSOCIATION_RETAIN)
         }
     }
 }

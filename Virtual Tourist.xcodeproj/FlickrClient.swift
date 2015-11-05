@@ -23,7 +23,7 @@ class FlickrClient: NSObject {
                 completionHandler(data: nil, errorString: error!.localizedDescription)
             } else {
                 var parsingError: NSError? = nil
-                let parsedResult = NSJSONSerialization.JSONObjectWithData(data, options: .AllowFragments, error: &parsingError) as! NSDictionary
+                let parsedResult = (try! NSJSONSerialization.JSONObjectWithData(data, options: .AllowFragments)) as! NSDictionary
                 completionHandler(data: parsedResult, errorString: nil)
             }
         }
@@ -88,7 +88,7 @@ class FlickrClient: NSObject {
             
         }
         
-        return (!urlVars.isEmpty ? "?" : "") + join("&", urlVars)
+        return (!urlVars.isEmpty ? "?" : "") + urlVars.joinWithSeparator("&")
     }
     
     class func sharedInstance() -> FlickrClient {

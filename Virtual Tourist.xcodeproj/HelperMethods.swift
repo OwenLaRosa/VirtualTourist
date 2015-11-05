@@ -20,7 +20,7 @@ struct Helpers {
     
     /// Performs a search and gets image links for the Pin so that they can be downloaded later.
     func getImages(pin: Pin, completionHandler: (error: String?) -> Void) {
-        FlickrClient.sharedInstance().searchPhotosByLocation(CLLocationCoordinate2DMake(pin.latitude as! Double, pin.longitude as! Double), page: pin.nextPage as! Int) {data, error in
+        FlickrClient.sharedInstance().searchPhotosByLocation(CLLocationCoordinate2DMake(pin.latitude as Double, pin.longitude as Double), page: pin.nextPage as Int) {data, error in
             if error != nil {
                 completionHandler(error: "0") // error code for failed download
             } else {
@@ -30,7 +30,7 @@ struct Helpers {
                     pin.nextPage = NSNumber(integer: 1)
                     completionHandler(error: "1") // error code for no images on page
                 } else {
-                    let nextPage = (pin.nextPage as! Int) + 1
+                    let nextPage = (pin.nextPage as Int) + 1
                     pin.nextPage = NSNumber(integer: nextPage)
                 }
                 for i in data! {

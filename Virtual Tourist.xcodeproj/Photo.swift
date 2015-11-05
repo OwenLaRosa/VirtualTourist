@@ -33,8 +33,11 @@ class Photo: NSManagedObject {
     }
     
     override func prepareForDeletion() {
-        // called whenever a photo object is removed, CoreData will also delete all photos when a pin object is removed
-        NSFileManager.defaultManager().removeItemAtPath(Constants.documentsDirectory+imagePath, error: nil)
+        do {
+            // called whenever a photo object is removed, CoreData will also delete all photos when a pin object is removed
+            try NSFileManager.defaultManager().removeItemAtPath(Constants.documentsDirectory+imagePath)
+        } catch _ {
+        }
     }
     
 }

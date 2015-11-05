@@ -29,5 +29,5 @@ struct Constants {
     
     // MARK: - General constants for use throughout the application
     
-    static let documentsDirectory = (NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] as! String)+"/"
+    static let documentsDirectory = (NSSearchPathForDirectoriesInDomains(.DocumentDirectory, .UserDomainMask, true)[0] )+"/"
 }

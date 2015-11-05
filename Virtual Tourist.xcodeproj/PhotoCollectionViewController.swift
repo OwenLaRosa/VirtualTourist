@@ -33,7 +33,11 @@ class PhotoCollectionViewController: UIViewController, NSFetchedResultsControlle
         var error: NSError?
         // fetch the photo objects associated with the pin
         fetchedResultsController.delegate = self
-        fetchedResultsController.performFetch(&error)
+        do {
+            try fetchedResultsController.performFetch()
+        } catch let error1 as NSError {
+            error = error1
+        }
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -116,12 +120,12 @@ class PhotoCollectionViewController: UIViewController, NSFetchedResultsControlle
     }
     
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        let sectionInfo = self.fetchedResultsController.sections![section] as! NSFetchedResultsSectionInfo
+        let sectionInfo = self.fetchedResultsController.sections![section] 
         return sectionInfo.numberOfObjects
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-        var cell = collectionView.dequeueReusableCellWithReuseIdentifier("PhotoCollectionViewCell", forIndexPath: indexPath) as! PhotoCollectionViewCell
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("PhotoCollectionViewCell", forIndexPath: indexPath) as! PhotoCollectionViewCell
         
         configureCell(cell, atIndexPath: indexPath)
         
@@ -132,7 +136,7 @@ class PhotoCollectionViewController: UIViewController, NSFetchedResultsControlle
         let cell = collectionView.cellForItemAtIndexPath(indexPath) as! PhotoCollectionViewCell
         
         // toggle the selection state of the cell
-        if let index = find(selectedIndexes, indexPath) {
+        if let index = selectedIndexes.indexOf(indexPath) {
             selectedIndexes.removeAtIndex(index)
             cell.imageView.alpha = 1.0
             if selectedIndexes.count == 0 {
@@ -207,7 +211,7 @@ class PhotoCollectionViewController: UIViewController, NSFetchedResultsControlle
         }
         
         // because of the same issue with scrolling, update the selection state of the cell to the correct value
-        if let index = find(selectedIndexes, indexPath) {
+        if let index = selectedIndexes.indexOf(indexPath) {
             cell.imageView.alpha = 0.5
         } else {
             cell.imageView.alpha = 1.0
@@ -238,7 +242,7 @@ class PhotoCollectionViewController: UIViewController, NSFetchedResultsControlle
         deletedIndexPaths = [NSIndexPath]()
     }
     
-    func controller(controller: NSFetchedResultsController, didChangeObject anObject: AnyObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
+    func controller(controller: NSFetchedResultsController, didChangeObject anObject: NSManagedObject, atIndexPath indexPath: NSIndexPath?, forChangeType type: NSFetchedResultsChangeType, newIndexPath: NSIndexPath?) {
         switch type {
         case .Insert:
             insertedIndexPaths.append(newIndexPath!)
